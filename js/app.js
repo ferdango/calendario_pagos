@@ -6,6 +6,8 @@
 
   const fmtPen = (n) =>
     "S/ " + Number(n || 0).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const fmtUsd = (n) =>
+    "US$ " + Number(n || 0).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const fmtMonto = (r) =>
     (r.moneda === "USD" ? "US$ " : "S/ ") +
     Number(r.monto || 0).toLocaleString("es-PE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -16,6 +18,15 @@
 
   function isoDate(d) {
     return d.toISOString().slice(0, 10);
+  }
+
+  function pagosDelMesVisible() {
+    const year = state.monthCursor.getFullYear();
+    const month = state.monthCursor.getMonth(); // 0-based
+    return state.pagos.filter((p) => {
+      const [y, m] = p.fecha.split("-").map(Number);
+      return y === year && m - 1 === month;
+    });
   }
 
   function estadoDotClass(estado) {
@@ -43,15 +54,15 @@
 
   function renderKpis() {
     const sums = { Pagado: 0, Pendiente: 0, Vencido: 0 };
-    let usdCount = 0;
-    for (const p of state.pagos) {
+    let usdTotal = 0;
+    for (const p of pagosDelMesVisible()) {
       sums[p.estado] = (sums[p.estado] || 0) + p.montoPen;
-      if (p.moneda === "USD") usdCount += 1;
+      if (p.moneda === "USD") usdTotal += Number(p.monto || 0);
     }
     document.getElementById("kpiPagado").textContent = fmtPen(sums.Pagado);
     document.getElementById("kpiPendiente").textContent = fmtPen(sums.Pendiente);
     document.getElementById("kpiVencido").textContent = fmtPen(sums.Vencido);
-    document.getElementById("kpiUsdCount").textContent = String(usdCount);
+    document.getElementById("kpiUsdTotal").textContent = fmtUsd(usdTotal);
   }
 
   function renderCalendar() {
@@ -214,10 +225,12 @@
   document.getElementById("prevMonth").addEventListener("click", () => {
     state.monthCursor = new Date(state.monthCursor.getFullYear(), state.monthCursor.getMonth() - 1, 1);
     renderCalendar();
+    renderKpis();
   });
   document.getElementById("nextMonth").addEventListener("click", () => {
     state.monthCursor = new Date(state.monthCursor.getFullYear(), state.monthCursor.getMonth() + 1, 1);
     renderCalendar();
+    renderKpis();
   });
   document.getElementById("detailClose").addEventListener("click", closeDetail);
   document.getElementById("detailOverlay").addEventListener("click", (e) => {
