@@ -25,5 +25,5 @@ Calendario mensual de pagos conectado a Supabase: grilla por día, chips de filt
 
 ## Notas
 
-- "Marcar pagado" hace un `PATCH` a la tabla; con la key pública (`anon`) solo funciona si hay una sesión autenticada (la policy de update es para el rol `authenticated`).
+- "Marcar pagado" hace un `PATCH` a la tabla; la policy de update permite al rol `anon`, así que funciona con la key pública sin necesidad de login. Ten en cuenta que esto también significa que cualquiera con la key puede modificar el estado de un pago — si más adelante se necesita restringirlo, hay que volver a policies por `authenticated`.
 - El tipo de cambio USD→PEN usa `tipo_cambio` de la fila si existe, o el valor por defecto en `js/config.js` (`3.75`).

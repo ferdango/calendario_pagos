@@ -75,8 +75,8 @@
       }));
   }
 
-  // Requiere un usuario autenticado (policy "actualizar estado" es solo para `authenticated`);
-  // con la publishable key anónima esta llamada devolverá 401/403 hasta que haya sesión.
+  // La policy "actualizar estado" permite al rol `anon`, por lo que la publishable key
+  // alcanza para este PATCH sin sesión autenticada.
   async function marcarPagado(cfg, id, accessToken) {
     const res = await fetch(restUrl(cfg, `?id=eq.${encodeURIComponent(id)}`), {
       method: "PATCH",

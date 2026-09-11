@@ -45,5 +45,5 @@ create policy "lectura anon"
 drop policy if exists "actualizar estado" on public.calendario_pagos;
 create policy "actualizar estado"
   on public.calendario_pagos for update
-  to authenticated
+  to anon
   using (true) with check (true);

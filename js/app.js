@@ -237,8 +237,7 @@
       closeDetail();
       await load();
     } catch (err) {
-      errEl.textContent =
-        "No se pudo actualizar (requiere sesión autenticada; la key pública es de solo lectura).";
+      errEl.textContent = "No se pudo actualizar: " + err.message;
       errEl.hidden = false;
       console.error(err);
     }
