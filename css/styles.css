@@ -1,0 +1,244 @@
+:root {
+  --bg: #f4f5f7;
+  --card: #ffffff;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --pagado: #16a34a;
+  --pagado-bg: #dcfce7;
+  --pendiente: #2563eb;
+  --pendiente-bg: #dbeafe;
+  --vencido: #dc2626;
+  --vencido-bg: #fee2e2;
+  --accent: #4f46e5;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.topbar h1 { font-size: 1.4rem; margin: 0; }
+
+.month-nav { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+.month-nav button {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kpi-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.kpi-value { font-size: 1.1rem; font-weight: 700; }
+.kpi-pagado .kpi-value { color: var(--pagado); }
+.kpi-pendiente .kpi-value { color: var(--pendiente); }
+.kpi-vencido .kpi-value { color: var(--vencido); }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.chip {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.chip.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.content { display: grid; grid-template-columns: 1fr 260px; gap: 20px; align-items: start; }
+
+.calendar-wrap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+.weekday-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 4px 0 8px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.day-cell {
+  min-height: 84px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  cursor: pointer;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.day-cell.empty { visibility: hidden; }
+.day-cell.today { border-color: var(--accent); }
+.day-cell:hover { background: #f0f1ff; }
+.day-number { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+.day-total { font-size: 0.8rem; font-weight: 700; }
+.day-dots { display: flex; gap: 3px; flex-wrap: wrap; }
+.dot { width: 7px; height: 7px; border-radius: 50%; }
+.dot-pagado { background: var(--pagado); }
+.dot-pendiente { background: var(--pendiente); }
+.dot-vencido { background: var(--vencido); }
+
+.sidebar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+.sidebar h2 { font-size: 0.95rem; margin: 0 0 10px; }
+.upcoming-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.upcoming-list li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.upcoming-list li:hover { background: #f8f8ff; }
+.upcoming-date { color: var(--muted); font-size: 0.72rem; }
+
+.tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 25, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 30;
+}
+.overlay[hidden] { display: none; }
+
+.detail-popup {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 22px;
+  max-width: 380px;
+  width: 100%;
+  position: relative;
+}
+.detail-close {
+  position: absolute;
+  top: 10px; right: 10px;
+  border: none;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.detail-popup h3 { margin: 0 0 4px; font-size: 1.1rem; }
+.detail-monto { font-size: 1.6rem; font-weight: 800; margin: 4px 0 14px; }
+.detail-fields { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 0.85rem; margin: 0 0 14px; }
+.detail-fields dt { color: var(--muted); }
+.detail-fields dd { margin: 0; text-align: right; }
+#detailComprobante { display: inline-block; margin-bottom: 12px; font-size: 0.85rem; color: var(--accent); }
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:disabled { background: var(--muted); cursor: not-allowed; }
+.detail-error { color: var(--vencido); font-size: 0.78rem; margin-top: 8px; }
+
+.day-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 18, 25, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 25;
+}
+.day-panel[hidden] { display: none; }
+.day-panel-inner {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 70vh;
+  overflow-y: auto;
+  position: relative;
+}
+.day-payment-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.day-payment-list li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+.day-payment-list li:hover { background: #f8f8ff; }
+
+@media (max-width: 720px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .content { grid-template-columns: 1fr; }
+  .day-cell { min-height: 64px; }
+}

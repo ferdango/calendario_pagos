@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calendario de Pagos — Transitur</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <h1>Calendario de Pagos</h1>
+      <div class="month-nav">
+        <button id="prevMonth" aria-label="Mes anterior">‹</button>
+        <span id="monthLabel">—</span>
+        <button id="nextMonth" aria-label="Mes siguiente">›</button>
+      </div>
+    </header>
+
+    <section class="kpis" id="kpis">
+      <div class="kpi kpi-pagado">
+        <span class="kpi-label">Pagado</span>
+        <span class="kpi-value" id="kpiPagado">S/ 0.00</span>
+      </div>
+      <div class="kpi kpi-pendiente">
+        <span class="kpi-label">Pendiente</span>
+        <span class="kpi-value" id="kpiPendiente">S/ 0.00</span>
+      </div>
+      <div class="kpi kpi-vencido">
+        <span class="kpi-label">Vencido</span>
+        <span class="kpi-value" id="kpiVencido">S/ 0.00</span>
+      </div>
+      <div class="kpi kpi-usd">
+        <span class="kpi-label">En USD</span>
+        <span class="kpi-value" id="kpiUsdCount">0</span>
+      </div>
+    </section>
+
+    <section class="chips" id="categoryChips" aria-label="Filtrar por categoría"></section>
+
+    <main class="content">
+      <section class="calendar-wrap">
+        <div class="weekday-row">
+          <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <aside class="sidebar">
+        <h2>Próximos vencimientos</h2>
+        <ul class="upcoming-list" id="upcomingList"></ul>
+      </aside>
+    </main>
+  </div>
+
+  <div class="overlay" id="detailOverlay" hidden>
+    <div class="detail-popup" role="dialog" aria-modal="true">
+      <button class="detail-close" id="detailClose" aria-label="Cerrar">×</button>
+      <span class="tag" id="detailCategoria"></span>
+      <h3 id="detailBeneficiario"></h3>
+      <p class="detail-monto" id="detailMonto"></p>
+      <dl class="detail-fields">
+        <dt>Fecha</dt><dd id="detailFecha"></dd>
+        <dt>Estado</dt><dd id="detailEstado"></dd>
+        <dt>N.º factura / ref.</dt><dd id="detailReferencia"></dd>
+        <dt>Cuenta bancaria</dt><dd id="detailCuenta"></dd>
+        <dt>Método de pago</dt><dd id="detailMetodo"></dd>
+        <dt>Notas</dt><dd id="detailNotas"></dd>
+      </dl>
+      <a id="detailComprobante" href="#" target="_blank" rel="noopener" hidden>Ver comprobante</a>
+      <button id="marcarPagadoBtn" class="btn-primary">Marcar pagado</button>
+      <p class="detail-error" id="detailError" hidden></p>
+    </div>
+  </div>
+
+  <div class="day-panel" id="dayPanel" hidden>
+    <div class="day-panel-inner">
+      <button class="detail-close" id="dayPanelClose" aria-label="Cerrar">×</button>
+      <h3 id="dayPanelTitle"></h3>
+      <ul class="day-payment-list" id="dayPanelList"></ul>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/supabase-pagos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
