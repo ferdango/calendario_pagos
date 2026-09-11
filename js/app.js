@@ -1,15 +1,6 @@
 (function () {
-  const CATEGORIAS = [
-    "Gasto operacional",
-    "Compra de bienes",
-    "Compra de activos",
-    "Impuestos",
-    "Préstamo bancario",
-  ];
-
   const state = {
     pagos: [],
-    activeCategorias: new Set(CATEGORIAS),
     monthCursor: startOfMonth(new Date()),
   };
 
@@ -41,29 +32,7 @@
       state.pagos = [];
       alert("No se pudo cargar el calendario de pagos: " + err.message);
     }
-    renderChips();
     renderAll();
-  }
-
-  function visiblePagos() {
-    return state.pagos.filter((p) => state.activeCategorias.has(p.categoria));
-  }
-
-  function renderChips() {
-    const wrap = document.getElementById("categoryChips");
-    wrap.innerHTML = "";
-    CATEGORIAS.forEach((cat) => {
-      const chip = document.createElement("button");
-      chip.className = "chip" + (state.activeCategorias.has(cat) ? " active" : "");
-      chip.textContent = cat;
-      chip.addEventListener("click", () => {
-        if (state.activeCategorias.has(cat)) state.activeCategorias.delete(cat);
-        else state.activeCategorias.add(cat);
-        renderChips();
-        renderAll();
-      });
-      wrap.appendChild(chip);
-    });
   }
 
   function renderAll() {
@@ -73,10 +42,9 @@
   }
 
   function renderKpis() {
-    const pagos = visiblePagos();
     const sums = { Pagado: 0, Pendiente: 0, Vencido: 0 };
     let usdCount = 0;
-    for (const p of pagos) {
+    for (const p of state.pagos) {
       sums[p.estado] = (sums[p.estado] || 0) + p.montoPen;
       if (p.moneda === "USD") usdCount += 1;
     }
@@ -101,7 +69,7 @@
     const leadingBlanks = (firstDay.getDay() + 6) % 7; // lunes=0
 
     const byDate = {};
-    for (const p of visiblePagos()) {
+    for (const p of state.pagos) {
       (byDate[p.fecha] ||= []).push(p);
     }
 
@@ -153,7 +121,7 @@
     const todayIso = isoDate(new Date());
     const list = document.getElementById("upcomingList");
     list.innerHTML = "";
-    const upcoming = visiblePagos()
+    const upcoming = state.pagos
       .filter((p) => p.estado !== "Pagado" && p.fecha >= todayIso)
       .sort((a, b) => a.fecha.localeCompare(b.fecha))
       .slice(0, 10);

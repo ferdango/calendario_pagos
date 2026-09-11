@@ -43,11 +43,16 @@ body {
 }
 
 .kpis {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
 }
+.kpis::-webkit-scrollbar { height: 6px; }
+.kpis::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 .kpi {
   background: var(--card);
   border: 1px solid var(--border);
@@ -56,33 +61,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 0 0 auto;
+  width: 160px;
+  scroll-snap-align: start;
 }
 .kpi-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
 .kpi-value { font-size: 1.1rem; font-weight: 700; }
 .kpi-pagado .kpi-value { color: var(--pagado); }
 .kpi-pendiente .kpi-value { color: var(--pendiente); }
 .kpi-vencido .kpi-value { color: var(--vencido); }
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-.chip {
-  border: 1px solid var(--border);
-  background: var(--card);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  color: var(--muted);
-}
-.chip.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
 
 .content { display: grid; grid-template-columns: 1fr 260px; gap: 20px; align-items: start; }
 
@@ -238,7 +225,7 @@ body {
 .day-payment-list li:hover { background: #f8f8ff; }
 
 @media (max-width: 720px) {
-  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .kpi { width: 140px; }
   .content { grid-template-columns: 1fr; }
   .day-cell { min-height: 64px; }
 }
