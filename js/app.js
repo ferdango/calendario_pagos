@@ -2,6 +2,7 @@
   const state = {
     pagos: [],
     monthCursor: startOfMonth(new Date()),
+    view: "calendar", // "calendar" | "list"
   };
 
   const fmtPen = (n) =>
@@ -35,6 +36,12 @@
     return "dot-pendiente";
   }
 
+  function estadoRowClass(estado) {
+    if (estado === "Pagado") return "estado-pagado";
+    if (estado === "Vencido") return "estado-vencido";
+    return "";
+  }
+
   async function load() {
     try {
       state.pagos = await SupabasePagos.fetchPagos(window.SUPABASE_CONFIG);
@@ -46,9 +53,19 @@
     renderAll();
   }
 
-  function renderAll() {
-    renderKpis();
+  async function marcarPagadoRequest(id) {
+    await SupabasePagos.marcarPagado(window.SUPABASE_CONFIG, id);
+    await load();
+  }
+
+  function renderMonthDependent() {
     renderCalendar();
+    renderKpis();
+    if (state.view === "list") renderTimelineList();
+  }
+
+  function renderAll() {
+    renderMonthDependent();
     renderUpcoming();
   }
 
@@ -128,6 +145,58 @@
     }
   }
 
+  // Fila reutilizable para un pago: usada en "Próximos vencimientos", la vista Lista
+  // y el panel del día. Incluye una acción rápida "Marcar pagado" (si aplica),
+  // sin necesidad de abrir el detalle completo.
+  function buildEventRow(p, opts = {}) {
+    const { showDate = false, onOpen, onPaid } = opts;
+
+    const li = document.createElement("li");
+    li.className = "event-row " + estadoRowClass(p.estado);
+
+    const main = document.createElement("div");
+    main.className = "event-main";
+    const title = document.createElement("div");
+    title.className = "event-title";
+    title.textContent = p.beneficiario;
+    const sub = document.createElement("div");
+    sub.className = "event-sub";
+    sub.textContent = showDate ? `${p.fecha} · ${p.categoria}` : p.categoria;
+    main.append(title, sub);
+
+    const side = document.createElement("div");
+    side.className = "event-side";
+    const amount = document.createElement("span");
+    amount.className = "event-amount";
+    amount.textContent = fmtMonto(p);
+    side.appendChild(amount);
+
+    if (p.estado !== "Pagado") {
+      const btn = document.createElement("button");
+      btn.className = "quick-pay-btn";
+      btn.textContent = "Marcar pagado";
+      btn.addEventListener("click", async (e) => {
+        e.stopPropagation();
+        btn.disabled = true;
+        btn.textContent = "…";
+        try {
+          await marcarPagadoRequest(p.id);
+          if (onPaid) onPaid();
+        } catch (err) {
+          console.error(err);
+          btn.disabled = false;
+          btn.textContent = "Marcar pagado";
+          alert("No se pudo marcar como pagado: " + err.message);
+        }
+      });
+      side.appendChild(btn);
+    }
+
+    li.append(main, side);
+    li.addEventListener("click", () => (onOpen ? onOpen(p) : openDetail(p)));
+    return li;
+  }
+
   function renderUpcoming() {
     const todayIso = isoDate(new Date());
     const list = document.getElementById("upcomingList");
@@ -139,31 +208,62 @@
 
     if (!upcoming.length) {
       const li = document.createElement("li");
+      li.className = "timeline-empty";
       li.textContent = "Sin vencimientos próximos.";
       list.appendChild(li);
       return;
     }
 
-    upcoming.forEach((p) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<div class="upcoming-date">${p.fecha}</div><div>${p.beneficiario}</div>`;
-      li.addEventListener("click", () => openDetail(p));
-      list.appendChild(li);
+    upcoming.forEach((p) => list.appendChild(buildEventRow(p, { showDate: true })));
+  }
+
+  function renderTimelineList() {
+    const wrap = document.getElementById("timelineList");
+    wrap.innerHTML = "";
+    const items = pagosDelMesVisible().slice().sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+    if (!items.length) {
+      const empty = document.createElement("li");
+      empty.className = "timeline-empty";
+      empty.textContent = "Sin pagos este mes.";
+      wrap.appendChild(empty);
+      return;
+    }
+
+    let lastDate = null;
+    items.forEach((p) => {
+      if (p.fecha !== lastDate) {
+        lastDate = p.fecha;
+        const heading = document.createElement("li");
+        heading.className = "timeline-day-heading";
+        heading.textContent = new Date(p.fecha + "T00:00:00").toLocaleDateString("es-PE", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+        wrap.appendChild(heading);
+      }
+      wrap.appendChild(buildEventRow(p));
     });
   }
 
   function openDayPanel(iso, items) {
-    document.getElementById("dayPanelTitle").textContent = iso;
+    document.getElementById("dayPanelTitle").textContent = new Date(iso + "T00:00:00").toLocaleDateString(
+      "es-PE",
+      { weekday: "long", day: "numeric", month: "long", year: "numeric" }
+    );
     const list = document.getElementById("dayPanelList");
     list.innerHTML = "";
     items.forEach((p) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<span>${p.beneficiario}</span><strong>${fmtMonto(p)}</strong>`;
-      li.addEventListener("click", () => {
-        closeDayPanel();
-        openDetail(p);
-      });
-      list.appendChild(li);
+      list.appendChild(
+        buildEventRow(p, {
+          onOpen: (payment) => {
+            closeDayPanel();
+            openDetail(payment);
+          },
+          onPaid: closeDayPanel,
+        })
+      );
     });
     document.getElementById("dayPanel").hidden = false;
   }
@@ -207,14 +307,13 @@
     currentDetail = null;
   }
 
-  async function marcarPagado() {
+  async function marcarPagadoDesdeDetalle() {
     if (!currentDetail) return;
     const errEl = document.getElementById("detailError");
     errEl.hidden = true;
     try {
-      await SupabasePagos.marcarPagado(window.SUPABASE_CONFIG, currentDetail.id);
+      await marcarPagadoRequest(currentDetail.id);
       closeDetail();
-      await load();
     } catch (err) {
       errEl.textContent = "No se pudo actualizar: " + err.message;
       errEl.hidden = false;
@@ -222,16 +321,33 @@
     }
   }
 
+  function setView(view) {
+    state.view = view;
+    const calBtn = document.getElementById("viewCalendarBtn");
+    const listBtn = document.getElementById("viewListBtn");
+    calBtn.classList.toggle("active", view === "calendar");
+    calBtn.setAttribute("aria-selected", String(view === "calendar"));
+    listBtn.classList.toggle("active", view === "list");
+    listBtn.setAttribute("aria-selected", String(view === "list"));
+    document.getElementById("calendarWrap").hidden = view !== "calendar";
+    document.getElementById("listWrap").hidden = view !== "list";
+    if (view === "list") renderTimelineList();
+  }
+
   document.getElementById("prevMonth").addEventListener("click", () => {
     state.monthCursor = new Date(state.monthCursor.getFullYear(), state.monthCursor.getMonth() - 1, 1);
-    renderCalendar();
-    renderKpis();
+    renderMonthDependent();
   });
   document.getElementById("nextMonth").addEventListener("click", () => {
     state.monthCursor = new Date(state.monthCursor.getFullYear(), state.monthCursor.getMonth() + 1, 1);
-    renderCalendar();
-    renderKpis();
+    renderMonthDependent();
   });
+  document.getElementById("todayBtn").addEventListener("click", () => {
+    state.monthCursor = startOfMonth(new Date());
+    renderMonthDependent();
+  });
+  document.getElementById("viewCalendarBtn").addEventListener("click", () => setView("calendar"));
+  document.getElementById("viewListBtn").addEventListener("click", () => setView("list"));
   document.getElementById("detailClose").addEventListener("click", closeDetail);
   document.getElementById("detailOverlay").addEventListener("click", (e) => {
     if (e.target.id === "detailOverlay") closeDetail();
@@ -240,7 +356,7 @@
   document.getElementById("dayPanel").addEventListener("click", (e) => {
     if (e.target.id === "dayPanel") closeDayPanel();
   });
-  document.getElementById("marcarPagadoBtn").addEventListener("click", marcarPagado);
+  document.getElementById("marcarPagadoBtn").addEventListener("click", marcarPagadoDesdeDetalle);
 
   load();
 })();

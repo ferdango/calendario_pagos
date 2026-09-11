@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Pagos — Transitur</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css?v=20260911" />
 </head>
 <body>
   <div class="app">
@@ -14,6 +14,7 @@
         <button id="prevMonth" aria-label="Mes anterior">‹</button>
         <span id="monthLabel">—</span>
         <button id="nextMonth" aria-label="Mes siguiente">›</button>
+        <button id="todayBtn" class="today-btn">Hoy</button>
       </div>
     </header>
 
@@ -36,12 +37,21 @@
       </div>
     </section>
 
+    <div class="view-toggle" role="tablist" aria-label="Vista">
+      <button class="view-toggle-btn active" id="viewCalendarBtn" role="tab" aria-selected="true">Calendario</button>
+      <button class="view-toggle-btn" id="viewListBtn" role="tab" aria-selected="false">Lista</button>
+    </div>
+
     <main class="content">
-      <section class="calendar-wrap">
+      <section class="calendar-wrap" id="calendarWrap">
         <div class="weekday-row">
           <span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span>
         </div>
         <div class="calendar-grid" id="calendarGrid"></div>
+      </section>
+
+      <section class="list-wrap" id="listWrap" hidden>
+        <ul class="timeline-list" id="timelineList"></ul>
       </section>
 
       <aside class="sidebar">
@@ -79,8 +89,8 @@
     </div>
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/supabase-pagos.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/config.js?v=20260911"></script>
+  <script src="js/supabase-pagos.js?v=20260911"></script>
+  <script src="js/app.js?v=20260911"></script>
 </body>
 </html>
