@@ -98,9 +98,8 @@ body {
 }
 .kpi-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
 .kpi-value { font-size: 1.1rem; font-weight: 700; }
-.kpi-total { border-color: var(--accent); }
 .kpi-total .kpi-value { color: var(--accent); }
-.kpi-ingresos { width: 210px; }
+.kpi-ingresos { width: 210px; border-color: var(--pagado); }
 .kpi-ingresos .kpi-value { color: var(--pagado); }
 .kpi-nota { font-size: 0.68rem; color: var(--muted); }
 .kpi-pagado .kpi-value { color: var(--pagado); }
