@@ -140,6 +140,51 @@ body {
 .day-cell.empty { visibility: hidden; }
 .day-cell.today { border-color: var(--accent); }
 .day-cell:hover { background: #f0f1ff; }
+
+/* Día con todos los pagos saldados: se llena de verde de abajo hacia arriba
+   y el check se dibuja encima. */
+.day-cell.day-pagado {
+  border-color: var(--pagado);
+  position: relative;
+  overflow: hidden;
+}
+.day-cell.day-pagado::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--pagado-bg);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  animation: llenarPagado 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.day-cell.day-pagado > * { position: relative; z-index: 1; }
+@keyframes llenarPagado { to { transform: scaleY(1); } }
+
+.check-icon {
+  width: 26px;
+  height: 26px;
+  display: block;
+  margin: auto;
+  color: var(--pagado);
+}
+.check-icon path {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: dibujarCheck 0.35s ease-out 0.28s forwards;
+}
+@keyframes dibujarCheck { to { stroke-dashoffset: 0; } }
+
+/* Día con algún pago vencido: fondo rojo sutil. */
+.day-cell.day-vencido {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.35);
+}
+.day-cell.day-vencido:hover { background: rgba(220, 38, 38, 0.14); }
+
+@media (prefers-reduced-motion: reduce) {
+  .day-cell.day-pagado::after { animation: none; transform: scaleY(1); }
+  .check-icon path { animation: none; stroke-dashoffset: 0; }
+}
 .day-number { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
 .day-total { font-size: 0.8rem; font-weight: 700; }
 .day-dots { display: flex; gap: 3px; flex-wrap: wrap; }

@@ -42,10 +42,13 @@
     return mapped;
   }
 
+  // La columna `estado` en Postgres tiene default 'Pendiente' y nadie la mueve
+  // cuando la fecha pasa, así que el vencimiento se deduce siempre por fecha.
+  // Solo 'Pagado' es un estado explícito que hay que respetar.
   function deriveEstado(row, todayISO) {
-    if (row.estado) return row.estado;
-    if (!row.fecha) return "Pendiente";
-    return row.fecha < todayISO ? "Vencido" : "Pendiente";
+    if (row.estado === "Pagado") return "Pagado";
+    if (row.fecha && row.fecha < todayISO) return "Vencido";
+    return row.estado || "Pendiente";
   }
 
   function restUrl(cfg, extra) {

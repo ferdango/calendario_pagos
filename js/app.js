@@ -49,6 +49,23 @@
     return "";
   }
 
+  function checkIcon() {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("class", "check-icon");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Pagado");
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", "M4 12.5 L9.5 18 L20 6.5");
+    path.setAttribute("stroke", "currentColor");
+    path.setAttribute("stroke-width", "2.5");
+    path.setAttribute("stroke-linecap", "round");
+    path.setAttribute("stroke-linejoin", "round");
+    svg.appendChild(path);
+    return svg;
+  }
+
   async function load() {
     try {
       state.pagos = await SupabasePagos.fetchPagos(window.SUPABASE_CONFIG);
@@ -134,19 +151,30 @@
       cell.appendChild(num);
 
       if (items.length) {
-        const totalEl = document.createElement("div");
-        totalEl.className = "day-total";
-        totalEl.textContent = fmtPen(total);
-        cell.appendChild(totalEl);
+        // Día saldado por completo: se llena de verde con un check y se ocultan
+        // monto y dots, porque ya no hay nada que revisar ahí.
+        if (items.every((p) => p.estado === "Pagado")) {
+          cell.classList.add("day-pagado");
+          cell.appendChild(checkIcon());
+        } else {
+          if (items.some((p) => p.estado === "Vencido")) {
+            cell.classList.add("day-vencido");
+          }
 
-        const dots = document.createElement("div");
-        dots.className = "day-dots";
-        items.slice(0, 8).forEach((p) => {
-          const dot = document.createElement("span");
-          dot.className = "dot " + estadoDotClass(p.estado);
-          dots.appendChild(dot);
-        });
-        cell.appendChild(dots);
+          const totalEl = document.createElement("div");
+          totalEl.className = "day-total";
+          totalEl.textContent = fmtPen(total);
+          cell.appendChild(totalEl);
+
+          const dots = document.createElement("div");
+          dots.className = "day-dots";
+          items.slice(0, 8).forEach((p) => {
+            const dot = document.createElement("span");
+            dot.className = "dot " + estadoDotClass(p.estado);
+            dots.appendChild(dot);
+          });
+          cell.appendChild(dots);
+        }
 
         cell.addEventListener("click", () => openDayPanel(iso, items));
       }
