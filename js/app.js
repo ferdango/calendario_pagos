@@ -21,6 +21,13 @@
     return d.toISOString().slice(0, 10);
   }
 
+  function fmtFechaCorta(iso) {
+    return new Date(iso + "T00:00:00").toLocaleDateString("es-PE", {
+      day: "numeric",
+      month: "short",
+    });
+  }
+
   function pagosDelMesVisible() {
     const year = state.monthCursor.getFullYear();
     const month = state.monthCursor.getMonth(); // 0-based
@@ -71,11 +78,14 @@
 
   function renderKpis() {
     const sums = { Pagado: 0, Pendiente: 0, Vencido: 0 };
+    let totalMes = 0;
     let usdTotal = 0;
     for (const p of pagosDelMesVisible()) {
       sums[p.estado] = (sums[p.estado] || 0) + p.montoPen;
+      totalMes += p.montoPen;
       if (p.moneda === "USD") usdTotal += Number(p.monto || 0);
     }
+    document.getElementById("kpiTotalMes").textContent = fmtPen(totalMes);
     document.getElementById("kpiPagado").textContent = fmtPen(sums.Pagado);
     document.getElementById("kpiPendiente").textContent = fmtPen(sums.Pendiente);
     document.getElementById("kpiVencido").textContent = fmtPen(sums.Vencido);
@@ -161,7 +171,7 @@
     title.textContent = p.beneficiario;
     const sub = document.createElement("div");
     sub.className = "event-sub";
-    sub.textContent = showDate ? `${p.fecha} · ${p.categoria}` : p.categoria;
+    sub.textContent = showDate ? `${fmtFechaCorta(p.fecha)} · ${p.categoria}` : p.categoria;
     main.append(title, sub);
 
     const side = document.createElement("div");
@@ -279,7 +289,9 @@
     document.getElementById("detailCategoria").textContent = p.categoria;
     document.getElementById("detailBeneficiario").textContent = p.beneficiario;
     document.getElementById("detailMonto").textContent = fmtMonto(p);
-    document.getElementById("detailFecha").textContent = p.fecha;
+    document.getElementById("detailFecha").textContent = new Date(
+      p.fecha + "T00:00:00"
+    ).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" });
     document.getElementById("detailEstado").textContent = p.estado;
     document.getElementById("detailReferencia").textContent = p.referencia || "—";
     document.getElementById("detailCuenta").textContent = p.cuenta_bancaria || "—";

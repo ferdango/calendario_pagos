@@ -98,6 +98,8 @@ body {
 }
 .kpi-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
 .kpi-value { font-size: 1.1rem; font-weight: 700; }
+.kpi-total { border-color: var(--accent); }
+.kpi-total .kpi-value { color: var(--accent); }
 .kpi-pagado .kpi-value { color: var(--pagado); }
 .kpi-pendiente .kpi-value { color: var(--pendiente); }
 .kpi-vencido .kpi-value { color: var(--vencido); }
@@ -236,6 +238,7 @@ body {
   padding: 22px;
   max-width: 380px;
   width: 100%;
+  min-width: 0;
   position: relative;
 }
 .detail-close {
@@ -251,7 +254,7 @@ body {
 .detail-monto { font-size: 1.6rem; font-weight: 800; margin: 4px 0 14px; }
 .detail-fields { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 0.85rem; margin: 0 0 14px; }
 .detail-fields dt { color: var(--muted); }
-.detail-fields dd { margin: 0; text-align: right; }
+.detail-fields dd { margin: 0; text-align: right; min-width: 0; overflow-wrap: anywhere; }
 #detailComprobante { display: inline-block; margin-bottom: 12px; font-size: 0.85rem; color: var(--accent); }
 .btn-primary {
   width: 100%;
@@ -283,6 +286,7 @@ body {
   padding: 20px;
   max-width: 420px;
   width: 100%;
+  min-width: 0;
   max-height: 70vh;
   overflow-y: auto;
   position: relative;
@@ -299,3 +303,8 @@ body {
   .event-row { flex-wrap: wrap; row-gap: 6px; }
   .event-side { width: 100%; justify-content: space-between; }
 }
+
+/* El sidebar es angosto (260px): ahí la fila siempre va apilada, si no el
+   nombre del beneficiario se trunca a una o dos letras. */
+.sidebar .event-row { flex-wrap: wrap; row-gap: 6px; }
+.sidebar .event-side { width: 100%; justify-content: space-between; }
