@@ -1,6 +1,7 @@
 (function () {
   const state = {
     pagos: [],
+    ingresos: {}, // 'YYYY-MM' -> fila de ingresos_mensuales
     monthCursor: startOfMonth(new Date()),
     view: "calendar", // "calendar" | "list"
   };
@@ -74,6 +75,13 @@
       state.pagos = [];
       alert("No se pudo cargar el calendario de pagos: " + err.message);
     }
+    // Los ingresos son un extra: si fallan, el calendario igual funciona.
+    try {
+      state.ingresos = await SupabasePagos.fetchIngresos(window.SUPABASE_CONFIG);
+    } catch (err) {
+      console.error("No se pudieron cargar los ingresos:", err);
+      state.ingresos = {};
+    }
     renderAll();
   }
 
@@ -107,6 +115,24 @@
     document.getElementById("kpiPendiente").textContent = fmtPen(sums.Pendiente);
     document.getElementById("kpiVencido").textContent = fmtPen(sums.Vencido);
     document.getElementById("kpiUsdTotal").textContent = fmtUsd(usdTotal);
+    renderIngresos();
+  }
+
+  function renderIngresos() {
+    const y = state.monthCursor.getFullYear();
+    const m = String(state.monthCursor.getMonth() + 1).padStart(2, "0");
+    const fila = state.ingresos[`${y}-${m}`];
+    const valorEl = document.getElementById("kpiIngresos");
+    const notaEl = document.getElementById("kpiIngresosNota");
+
+    if (!fila) {
+      valorEl.textContent = "—";
+      notaEl.textContent = "sin facturación cargada";
+      return;
+    }
+    const usd = Number(fila.monto_usd || 0);
+    valorEl.textContent = fmtPen(usd * window.SUPABASE_CONFIG.tipoCambioDefault);
+    notaEl.textContent = `${fmtUsd(usd)} · ${fila.servicios || 0} servicios`;
   }
 
   function renderCalendar() {

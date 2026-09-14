@@ -5,5 +5,6 @@ window.SUPABASE_CONFIG = {
   url: "https://rbcnjosixvyoodyunjkt.supabase.co",
   anonKey: "sb_publishable_vemYiTnRpBgS-ZLWRbL0MA_z-QxXdqT",
   table: "calendario_pagos",
+  tablaIngresos: "ingresos_mensuales",
   tipoCambioDefault: 3.35,
 };

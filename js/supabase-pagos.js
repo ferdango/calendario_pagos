@@ -101,5 +101,24 @@
     return data[0];
   }
 
-  global.SupabasePagos = { fetchPagos, marcarPagado, mapRow, normalizeKey };
+  // Ingresos sincronizados desde el Drive de reservas (pestaña Facturacion).
+  // Devuelve un mapa 'YYYY-MM' -> { monto_usd, servicios, actualizado_en }.
+  async function fetchIngresos(cfg) {
+    const url = `${cfg.url.replace(/\/$/, "")}/rest/v1/${encodeURIComponent(
+      cfg.tablaIngresos
+    )}?select=*`;
+    const res = await fetch(url, {
+      headers: { apikey: cfg.anonKey, Authorization: `Bearer ${cfg.anonKey}` },
+    });
+    if (!res.ok) {
+      throw new Error(`Supabase error ${res.status}: ${await res.text()}`);
+    }
+    const porMes = {};
+    for (const row of await res.json()) {
+      porMes[row.mes] = row;
+    }
+    return porMes;
+  }
+
+  global.SupabasePagos = { fetchPagos, fetchIngresos, marcarPagado, mapRow, normalizeKey };
 })(window);

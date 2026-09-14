@@ -1,6 +1,8 @@
 # Calendario de Pagos — Transitur
 
-Calendario mensual de pagos conectado a Supabase: grilla por día, chips de filtro por categoría, KPIs (Pagado / Pendiente / Vencido), lista de próximos vencimientos y detalle de pago con acción "Marcar pagado".
+Calendario mensual de pagos conectado a Supabase: vista Calendario/Lista, KPIs del mes (Total / Pagado / Pendiente / Vencido / En USD / Ingresos), próximos vencimientos y detalle de pago con acción "Marcar pagado".
+
+En la grilla, un día con todos sus pagos saldados se llena de verde con un check; un día con algún pago vencido queda con fondo rojo sutil.
 
 ## Estructura
 
@@ -26,4 +28,15 @@ Calendario mensual de pagos conectado a Supabase: grilla por día, chips de filt
 ## Notas
 
 - "Marcar pagado" hace un `PATCH` a la tabla; la policy de update permite al rol `anon`, así que funciona con la key pública sin necesidad de login. Ten en cuenta que esto también significa que cualquiera con la key puede modificar el estado de un pago — si más adelante se necesita restringirlo, hay que volver a policies por `authenticated`.
-- El tipo de cambio USD→PEN usa `tipo_cambio` de la fila si existe, o el valor por defecto en `js/config.js` (`3.75`).
+- El tipo de cambio USD→PEN usa `tipo_cambio` de la fila si existe, o el valor por defecto en `js/config.js` (`3.35`).
+- El estado `Vencido` se deduce en el front por fecha, no se lee de la base: la columna `estado` tiene default `'Pendiente'` y nada la actualiza cuando la fecha pasa. Solo `'Pagado'` se respeta como estado explícito.
+
+## Ingresos del mes
+
+La card "Ingresos del mes" no sale del calendario de pagos: viene del Drive de reservas (`reservas@transitur.pe`), un archivo por mes llamado `Reservas <Mes>`, pestaña **Facturacion**, fila **Total**, columna **Pre Unit** (neto sin IGV, en USD).
+
+Esos totales se copian a la tabla `ingresos_mensuales` en Supabase (`mes`, `monto_usd`, `servicios`, `origen`). El front lee esa tabla y convierte a soles con el tipo de cambio de `js/config.js`.
+
+**La sincronización es manual.** El sitio es estático y no puede leer Drive: la hoja no es pública y el navegador la bloquea por CORS (redirige al login de Google). Para refrescar hay que volver a leer los archivos de Drive y hacer upsert en `ingresos_mensuales`.
+
+Un mes sin fila en la tabla muestra "—" en vez de `S/ 0.00`, para no confundir "sin datos cargados" con "no hubo ingresos". Es el caso del mes en curso hasta que se cargan los precios en la hoja.

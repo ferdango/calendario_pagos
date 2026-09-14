@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Pagos — Transitur</title>
-  <link rel="stylesheet" href="css/styles.css?v=20260914b" />
+  <link rel="stylesheet" href="css/styles.css?v=20260914c" />
 </head>
 <body>
   <div class="app">
@@ -38,6 +38,11 @@
       <div class="kpi kpi-usd">
         <span class="kpi-label">En USD</span>
         <span class="kpi-value" id="kpiUsdTotal">US$ 0.00</span>
+      </div>
+      <div class="kpi kpi-ingresos">
+        <span class="kpi-label">Ingresos del mes</span>
+        <span class="kpi-value" id="kpiIngresos">—</span>
+        <span class="kpi-nota" id="kpiIngresosNota"></span>
       </div>
     </section>
 
@@ -93,8 +98,8 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=20260914b"></script>
-  <script src="js/supabase-pagos.js?v=20260914b"></script>
-  <script src="js/app.js?v=20260914b"></script>
+  <script src="js/config.js?v=20260914c"></script>
+  <script src="js/supabase-pagos.js?v=20260914c"></script>
+  <script src="js/app.js?v=20260914c"></script>
 </body>
 </html>
