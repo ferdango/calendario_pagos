@@ -1,6 +1,6 @@
 # Calendario de Pagos — Transitur
 
-Calendario mensual de pagos conectado a Supabase: vista Calendario/Lista, KPIs del mes (Total / Pagado / Pendiente / Vencido / En USD / Ingresos), próximos vencimientos y detalle de pago con acción "Marcar pagado".
+Calendario mensual de pagos conectado a Supabase: vista Calendario/Lista, KPIs del mes (Total / Pagado / Pendiente / Vencido / Ingresos), próximos vencimientos y detalle de pago con acción "Marcar pagado".
 
 En la grilla, un día con todos sus pagos saldados se llena de verde con un check; un día con algún pago vencido queda con fondo rojo sutil.
 

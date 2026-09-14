@@ -104,17 +104,14 @@
   function renderKpis() {
     const sums = { Pagado: 0, Pendiente: 0, Vencido: 0 };
     let totalMes = 0;
-    let usdTotal = 0;
     for (const p of pagosDelMesVisible()) {
       sums[p.estado] = (sums[p.estado] || 0) + p.montoPen;
       totalMes += p.montoPen;
-      if (p.moneda === "USD") usdTotal += Number(p.monto || 0);
     }
     document.getElementById("kpiTotalMes").textContent = fmtPen(totalMes);
     document.getElementById("kpiPagado").textContent = fmtPen(sums.Pagado);
     document.getElementById("kpiPendiente").textContent = fmtPen(sums.Pendiente);
     document.getElementById("kpiVencido").textContent = fmtPen(sums.Vencido);
-    document.getElementById("kpiUsdTotal").textContent = fmtUsd(usdTotal);
     renderIngresos();
   }
 
